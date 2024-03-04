@@ -19,9 +19,9 @@ abstract class BaseRepository
         return $this->getModel()->where($conditions)->with($with)->first();
     }
 
-    public function findAll($conditions = [], $with = [], $column = 'id', $order = 'DESC')
+    public function findAll($conditions = [], $with = [])
     {
-        return $this->getModel()->where($conditions)->with($with)->orderBy($column, $order)->get();
+        return $this->getModel()->where($conditions)->with($with)->orderBy('id', 'DESC')->get();
     }
 
     public function findAllPaginate($conditions = [], $with = [])

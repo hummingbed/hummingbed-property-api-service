@@ -1,10 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
+use App\Traits\HttpResponses;
 
 class BaseController extends Controller
 {
-    
+    use HttpResponses;
 }

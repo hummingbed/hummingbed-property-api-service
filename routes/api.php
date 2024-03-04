@@ -1,7 +1,8 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BrokersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,14 +19,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Route::get('/users', function () {
-//     // Your logic to fetch user data from the database or any other source
-//     $users = [
-//         ['id' => 1, 'name' => 'John'],
-//         ['id' => 2, 'name' => 'Jane'],
-//         ['id' => 3, 'name' => 'Doe'],
-//     ];
+Route::prefix('user')->group(function () {
+    Route::get('/data', [UserController::class, 'getUsers']);
 
-//     // Return the API response as JSON
-//     return response()->json($users);
-// });
+});
+
+Route::prefix('broker')->group(function () {
+    Route::get('/brokers', [BrokersController::class, 'getAllBrokers']);
+    Route::post('/save-broker', [BrokersController::class, 'addBroker']);
+    Route::get('/{id}/broker', [BrokersController::class, 'getBrokerUsingBrokerId']);
+});
