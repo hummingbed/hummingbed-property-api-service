@@ -6,6 +6,7 @@ use App\Services\BrokerService;
 use App\Helpers\ResponseMessages;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\StoreBrokerRequest;
+use App\Http\Requests\UpdateBrokerRequest;
 
 class BrokersController extends BaseController
 {
@@ -45,6 +46,28 @@ class BrokersController extends BaseController
             'data',
             $broker,
             ResponseMessages::getSuccessMessage('Brokers', 'retrieved'),
+            200
+        );
+    }
+
+    public function updateBroker(UpdateBrokerRequest $request, $id)
+    {
+        $broker = $this->brokerService->updateBrokerById($request, $id);
+        return $this->successHttpMessage(
+            'data',
+            $broker,
+            ResponseMessages::getSuccessMessage('Brokers', 'Updated'),
+            200
+        );
+    }
+
+    public function deleteBroker($id)
+    {
+        $this->brokerService->deleteBrokerById($id);
+        return $this->successHttpMessage(
+            'data',
+            null,
+            ResponseMessages::getSuccessMessage('Brokers', 'Deleted'),
             200
         );
     }

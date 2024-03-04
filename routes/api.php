@@ -28,4 +28,6 @@ Route::prefix('broker')->group(function () {
     Route::get('/brokers', [BrokersController::class, 'getAllBrokers']);
     Route::post('/save-broker', [BrokersController::class, 'addBroker']);
     Route::get('/{id}/broker', [BrokersController::class, 'getBrokerUsingBrokerId']);
+    Route::put('/{id}/update-broker', [BrokersController::class, 'updateBroker']);
+    Route::delete('/{id}/delete-broker', [BrokersController::class,'deleteBroker']);
 });

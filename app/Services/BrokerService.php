@@ -36,4 +36,20 @@ class BrokerService extends BaseService
             "logo_path" => $request->logo_path,
         ]);
     }
+
+    public function updateBrokerById($request, $id)
+    {
+        return $this->getBrokerById($id)->update([
+            "name"=> $request->name,
+            "address"=> $request->address,
+            "phone_number"=> $request->phone_number,
+            "city"=> $request->city,
+            "zip_code"=> $request->zip_code
+        ]);
+    }
+
+    public function deleteBrokerById($id)
+    {
+        return $this->getBrokerById($id)->delete();
+    }
 }
