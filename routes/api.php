@@ -18,14 +18,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/users', function () {
-    // Your logic to fetch user data from the database or any other source
-    $users = [
-        ['id' => 1, 'name' => 'John'],
-        ['id' => 2, 'name' => 'Jane'],
-        ['id' => 3, 'name' => 'Doe'],
-    ];
+// Route::get('/users', function () {
+//     // Your logic to fetch user data from the database or any other source
+//     $users = [
+//         ['id' => 1, 'name' => 'John'],
+//         ['id' => 2, 'name' => 'Jane'],
+//         ['id' => 3, 'name' => 'Doe'],
+//     ];
 
-    // Return the API response as JSON
-    return response()->json($users);
-});
+//     // Return the API response as JSON
+//     return response()->json($users);
+// });
