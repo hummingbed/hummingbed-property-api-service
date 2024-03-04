@@ -2,10 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
-class PropertyCharacteristic extends Model
+
+class PropertyCharacteristic extends BaseModel
 {
-    use HasFactory;
+    protected $fillable = [
+        "property_id",
+        "price",
+        "bedrooms",
+        "bathrooms",
+        "square_feet",
+        "price_square_feet",
+        "property_type",
+    ];
 }

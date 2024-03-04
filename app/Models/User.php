@@ -5,8 +5,18 @@ namespace App\Models;
 class User extends BaseModel
 {
     protected $fillable = [
-        'last_name',
-        'first_name',
+        'name',
         'email',
-    ];   
+        'password',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
 }
