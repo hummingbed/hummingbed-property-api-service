@@ -13,4 +13,9 @@ class Property extends BaseModel
         "description",
         "build_year",
     ];
+
+    public function characteristic()
+    {
+        return $this->hasOne(PropertyCharacteristic::class);
+    }
 }
