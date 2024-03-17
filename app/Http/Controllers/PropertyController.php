@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\PropertyResource;
+use App\Http\Resources\SinglePropertyResource;
 use App\Services\PropertyService;
 use App\Helpers\ResponseMessages;
 use App\Http\Requests\StorePropertyRequest;
@@ -28,12 +29,25 @@ class PropertyController extends BaseController
             200
         );
     }
+    
     public function storeProperty(StorePropertyRequest $request)
     {
         $this->propertyService->storePropertiesWithCharacteristics($request);
         return $this->successHttpMessage(
             'data',
             'null',
+            ResponseMessages::getSuccessMessage('Property', 'Saved'),
+            201
+        );
+    }
+
+    public function getSingleProperty($id)
+    {
+        $property = $this->propertyService->getPropertyById($id);
+        $propertyTransformer = new SinglePropertyResource($property);
+        return $this->successHttpMessage(
+            'data',
+            $propertyTransformer,
             ResponseMessages::getSuccessMessage('Property', 'Saved'),
             201
         );

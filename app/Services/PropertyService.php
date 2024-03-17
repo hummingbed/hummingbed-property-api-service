@@ -44,4 +44,14 @@ class PropertyService extends BaseService
 
         $this->propertyCharacteristicService->createPropertyCharacteristics($request, $property);
     }
+
+    public function updateProperties($request)
+    {
+
+    }
+
+    public function getPropertyById($id)
+    {
+        return $this->repo->findById($id);
+    }
 }
