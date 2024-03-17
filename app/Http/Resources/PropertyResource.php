@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Broker;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -24,8 +25,18 @@ class PropertyResource extends JsonResource
                 "description"=> $this->description,
                 "build_year"=> $this->build_year,
             ],
-            "characteristics"=> new CharacteristicsResource($this->whenLoaded($this->characteristic)),
+            "characteristics"=> $this->characteristic,
+            "broker"=> $this->broker($this->broker_id)
+        ];
+    }
 
+    private function broker($id)
+    {
+        $broker = Broker::find($id);
+        return [
+            "name" => $broker->name,
+            "address" => $broker->address,
+            "phone_number" => $broker->phone_number,
         ];
     }
 }

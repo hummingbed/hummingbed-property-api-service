@@ -14,15 +14,14 @@ class CharacteristicsResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return 
-        [
-            "price"=> $this->price,
-            "bedrooms"=> $this->bedrooms,
-            "bathrooms"=> $this->bathrooms,
-            "sq_ft"=> $this->square_feet,
-            "price_per_square_feet"=> $this->price_square_feet,
-            "property_type"=> $this->property_type,
-            "status"=> $this->status,
+        return [
+            "price"=> $this->id,
+            // "bedrooms"=> $this->bedrooms,
+            // "bathrooms"=> $this->bathrooms,
+            // "sq_ft"=> $this->square_feet,
+            // "price_per_square_feet"=> $this->price_square_feet,
+            // "property_type"=> $this->property_type,
+            // "status"=> $this->status,
         ];
     }
 }
