@@ -18,7 +18,6 @@ class StoreBrokerRequest extends BaseRequest
             'phone_number' => ['required', 'numeric', 'unique:brokers'],
             'city' => ['required'],
             'zip_code' => ['required'],
-            'logo_path' => ['required'],
         ];
     }
 }

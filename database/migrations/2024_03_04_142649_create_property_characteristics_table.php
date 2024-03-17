@@ -16,7 +16,8 @@ return new class extends Migration
         Schema::create('property_characteristics', function (Blueprint $table) {
             $table->unsignedBigInteger('property_id')->unique();
             $table->integer('price')->required();
-            $table->integer('bathrooms')->required();
+            $table->integer('bathrooms')->nullable();
+            $table->integer('bedrooms')->required();
             $table->float('square_feet')->required();
             $table->float('price_square_feet')->required();
             $table->enum('property_type', [

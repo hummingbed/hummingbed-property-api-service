@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Helpers\RandomLogo;
 
 return new class extends Migration
 {
@@ -18,7 +19,7 @@ return new class extends Migration
             $table->string('city')->required();
             $table->string('zip_code')->required();
             $table->string('phone_number')->required();
-            $table->string('logo_path')->required();
+            $table->string('logo')->default(RandomLogo::RANDOM_LOGO);
             $table->timestamps();
 
             $table->unique(['phone_number', 'zip_code']);

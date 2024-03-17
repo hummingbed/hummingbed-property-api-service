@@ -33,7 +33,6 @@ class BrokerService extends BaseService
             "phone_number" => $request->phone_number,
             "city" => $request->city,
             "zip_code" => $request->zip_code,
-            "logo_path" => $request->logo_path,
         ]);
     }
 

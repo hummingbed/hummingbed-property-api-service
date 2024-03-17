@@ -36,4 +36,5 @@ Route::prefix('broker')->group(function () {
 
 Route::prefix('property')->group(function () {
     Route::get('/properties', [PropertyController::class, 'getAllProperties']);
+    Route::post('/save-property', [PropertyController::class, 'storeProperty']);
 });
