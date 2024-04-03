@@ -32,3 +32,9 @@ Route::prefix('broker')->group(function () {
     Route::put('/{id}/update-broker', [BrokersController::class, 'updateBroker']);
     Route::delete('/{id}/delete-broker', [BrokersController::class, 'deleteBroker']);
 });
+
+Route::prefix('property')->group(function () {
+    Route::get('/properties', [PropertyController::class, 'getAllProperties']);
+    Route::post('/save-property', [PropertyController::class, 'storeProperty']);
+    Route::get('/{id}/property', [PropertyController::class, 'getSingleProperty']);
+});

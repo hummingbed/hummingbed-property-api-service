@@ -14,6 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('property_characteristics', function (Blueprint $table) {
+            $table->id(); // Add id column as primary key
             $table->unsignedBigInteger('property_id')->unique();
             $table->integer('price')->required();
             $table->integer('bathrooms')->nullable();
@@ -37,6 +38,7 @@ return new class extends Migration
 
             $table->foreign('property_id')->references('id')->on('properties')->cascadeOnDelete;
         });
+
     }
 
     /**
