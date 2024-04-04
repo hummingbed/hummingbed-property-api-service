@@ -20,9 +20,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/test', function () {
-    return 'testing page';
-});
 
 Route::prefix('broker')->group(function () {
     Route::get('/brokers', [BrokersController::class, 'getAllBrokers']);
