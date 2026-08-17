@@ -34,6 +34,11 @@ Route::prefix('property')->group(function () {
 });
 
 Route::prefix('v1')->group(function () {
+    Route::get('/health', fn () => response()->json([
+        'status' => 'success',
+        'data' => ['service' => 'hummingbed-property-api', 'timestamp' => now()->toISOString()],
+    ]));
+
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login']);
 

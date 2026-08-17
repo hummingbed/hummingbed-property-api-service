@@ -6,6 +6,27 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/v1/health": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Check API routing and availability",
+                "description": "Database-independent health check suitable for deployment monitoring.",
+                "operationId": "9ab30e8d0c939193bd3868a3bc596094",
+                "responses": {
+                    "200": {
+                        "description": "API is available"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
         "/api/v1/auth/register": {
             "post": {
                 "tags": [
@@ -1979,6 +2000,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Health",
+            "description": "Health"
+        },
         {
             "name": "Authentication",
             "description": "Authentication"
