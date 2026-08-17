@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\ResponseMessages;
 use App\Http\Requests\StoreBrokerRequest;
 use App\Http\Requests\UpdateBrokerRequest;
+use App\Models\Broker;
 use App\Services\BrokerService;
 use Illuminate\Http\JsonResponse;
 
@@ -32,7 +33,7 @@ class BrokersController extends BaseController
     public function addBroker(StoreBrokerRequest $request): JsonResponse
     {
         abort_unless(in_array($request->user()->role, ['broker', 'admin'], true), 403);
-        abort_if($request->user()->broker, 422, 'This account already has a broker profile.');
+        abort_if(Broker::where('user_id', $request->user()->id)->exists(), 422, 'This account already has a broker profile.');
         $broker = $this->brokerService->saveBroker($request, $request->user()->id);
 
         return $this->successHttpMessage(
