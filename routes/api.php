@@ -4,7 +4,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrokersController;
 use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\PropertyController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,21 +16,6 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-Route::prefix('broker')->group(function () {
-    Route::get('/brokers', [BrokersController::class, 'getAllBrokers']);
-    Route::get('/properties', [PropertyController::class, 'getAllProperties']);
-    Route::get('/{id}/broker', [BrokersController::class, 'getBrokerUsingBrokerId']);
-});
-
-Route::prefix('property')->group(function () {
-    Route::get('/properties', [PropertyController::class, 'getAllProperties']);
-    Route::get('/{id}/property', [PropertyController::class, 'getSingleProperty']);
-});
 
 Route::prefix('v1')->group(function () {
     Route::get('/health', fn () => response()->json([

@@ -6,7 +6,6 @@ use App\Helpers\ResponseMessages;
 use App\Http\Requests\StorePropertyRequest;
 use App\Http\Requests\UpdatePropertyRequest;
 use App\Http\Resources\PropertyResource;
-use App\Http\Resources\SinglePropertyResource;
 use App\Services\PropertyService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -51,7 +50,7 @@ class PropertyController extends BaseController
 
         return $this->successHttpMessage(
             'data',
-            new SinglePropertyResource($property),
+            new PropertyResource($property),
             ResponseMessages::getSuccessMessage('Property', 'Saved'),
             201
         );
@@ -60,7 +59,7 @@ class PropertyController extends BaseController
     public function getSingleProperty($id): JsonResponse
     {
         $property = $this->propertyService->getPropertyById($id);
-        $propertyTransformer = new SinglePropertyResource($property);
+        $propertyTransformer = new PropertyResource($property);
 
         return $this->successHttpMessage(
             'data',
@@ -77,7 +76,7 @@ class PropertyController extends BaseController
 
         return $this->successHttpMessage(
             'data',
-            new SinglePropertyResource($property),
+            new PropertyResource($property),
             ResponseMessages::getSuccessMessage('Property', 'updated'),
             200
         );

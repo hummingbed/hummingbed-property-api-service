@@ -18,69 +18,13 @@ abstract class BaseRepository
         return $this->getModel()->with($with)->find($id);
     }
 
-    public function findFirst($conditions, $with = [])
-    {
-        return $this->getModel()->where($conditions)->with($with)->first();
-    }
-
     public function findAll($conditions = [], $with = [])
     {
         return $this->getModel()->where($conditions)->with($with)->orderBy('id', 'DESC')->get();
     }
 
-    public function findAllPaginate($conditions = [], $with = [])
-    {
-        return $this->getModel()->where($conditions)->with($with)->orderBy('id', 'DESC')->paginate(self::PAGINATION);
-    }
-
-    public function findAllAndSelect($columns = '*', $conditions = [])
-    {
-        return $this->getModel()->where($conditions)->selectRaw($columns)->orderBy('id', 'DESC')->get();
-    }
-
     public function insert($attributes)
     {
         return $this->getModel()->create($attributes);
-    }
-
-    public function update($attributes, $id)
-    {
-        return $this->findById($id)->update($attributes);
-    }
-
-    public function deleteById($id): bool
-    {
-        $result = $this->findById($id);
-        if ($result) {
-            return $this->getModel()->destroy($id);
-        }
-
-        return false;
-    }
-
-    public function deleteFirst($conditions): bool
-    {
-        $result = $this->findFirst($conditions);
-        if ($result) {
-            return $this->getModel()->destroy($result->id);
-        }
-
-        return false;
-    }
-
-    public function deleteMany($conditions): int
-    {
-        $count = 0;
-        $results = $this->findAll($conditions);
-        if (count($results) > 0) {
-            foreach ($results as $result) {
-                if ($result) {
-                    $this->getModel()->destory($result->id);
-                    $count++;
-                }
-            }
-        }
-
-        return $count;
     }
 }
