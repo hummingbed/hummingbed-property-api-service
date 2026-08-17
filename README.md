@@ -36,6 +36,7 @@ The API is built with Laravel 10, uses Laravel Sanctum bearer tokens, stores dat
 
 - PHP 8.1 or later
 - Composer
+- Node.js 24 when building frontend assets or deploying to Vercel
 - PHP extensions required by Laravel, including `pdo_sqlite`
 
 ### Installation
