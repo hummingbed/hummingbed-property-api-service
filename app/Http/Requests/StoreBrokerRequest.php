@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 class StoreBrokerRequest extends BaseRequest
 {
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -15,9 +14,10 @@ class StoreBrokerRequest extends BaseRequest
         return [
             'name' => ['required', 'max:255'],
             'address' => ['required', 'max:255'],
-            'phone_number' => ['required', 'numeric', 'unique:brokers'],
-            'city' => ['required'],
-            'zip_code' => ['required'],
+            'phone_number' => ['required', 'string', 'max:30', 'unique:brokers,phone_number'],
+            'city' => ['required', 'string', 'max:100'],
+            'zip_code' => ['required', 'string', 'max:20'],
+            'logo' => ['nullable', 'url', 'max:2048'],
         ];
     }
 }

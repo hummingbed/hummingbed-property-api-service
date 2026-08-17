@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Repositories\BrokerRepository;
 use App\Exceptions\EntityNotFoundException;
 use App\Helpers\ResponseMessages;
+use App\Repositories\BrokerRepository;
 
 class BrokerService extends BaseService
 {
@@ -22,29 +22,21 @@ class BrokerService extends BaseService
     {
         $broker = $this->repo->findById($id);
         throw_unless($broker, new EntityNotFoundException(ResponseMessages::notFoundErrorMessage("Broker id $id")));
+
         return $broker;
     }
 
-    public function saveBroker($request)
+    public function saveBroker($request, int $userId)
     {
-        return $this->repo->insert([
-            "name" => $request->name,
-            "address" => $request->address,
-            "phone_number" => $request->phone_number,
-            "city" => $request->city,
-            "zip_code" => $request->zip_code,
-        ]);
+        return $this->repo->insert($request->validated() + ['user_id' => $userId]);
     }
 
     public function updateBrokerById($request, $id)
     {
-        return $this->getBrokerById($id)->update([
-            "name"=> $request->name,
-            "address"=> $request->address,
-            "phone_number"=> $request->phone_number,
-            "city"=> $request->city,
-            "zip_code"=> $request->zip_code
-        ]);
+        $broker = $this->getBrokerById($id);
+        $broker->update($request->validated());
+
+        return $broker->refresh();
     }
 
     public function deleteBrokerById($id)

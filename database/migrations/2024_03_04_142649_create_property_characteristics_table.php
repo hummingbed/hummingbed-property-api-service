@@ -1,10 +1,10 @@
 <?php
 
+use App\Enums\PropertyStatusEnum;
+use App\Enums\PropertyTypeEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Enums\PropertyTypeEnum;
-use App\Enums\PropertyStatusEnum;
 
 return new class extends Migration
 {
@@ -16,11 +16,11 @@ return new class extends Migration
         Schema::create('property_characteristics', function (Blueprint $table) {
             $table->id(); // Add id column as primary key
             $table->unsignedBigInteger('property_id')->unique();
-            $table->integer('price')->required();
+            $table->unsignedBigInteger('price');
             $table->integer('bathrooms')->nullable();
-            $table->integer('bedrooms')->required();
-            $table->float('square_feet')->required();
-            $table->float('price_square_feet')->required();
+            $table->unsignedSmallInteger('bedrooms');
+            $table->unsignedInteger('square_feet');
+            $table->unsignedBigInteger('price_square_feet');
             $table->enum('property_type', [
                 PropertyTypeEnum::SELF_CONTAINED->value,
                 PropertyTypeEnum::ONE_BEDROOM_FLAT->value,
@@ -33,10 +33,10 @@ return new class extends Migration
                 PropertyStatusEnum::HOLD->value,
                 PropertyStatusEnum::SALE->value,
                 PropertyStatusEnum::SOLD->value,
-            ])->required();
+            ]);
             $table->timestamps();
 
-            $table->foreign('property_id')->references('id')->on('properties')->cascadeOnDelete;
+            $table->foreign('property_id')->references('id')->on('properties')->cascadeOnDelete();
         });
 
     }

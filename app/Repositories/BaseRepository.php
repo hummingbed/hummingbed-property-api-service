@@ -6,12 +6,16 @@ abstract class BaseRepository
 {
     const PAGINATION = 10;
 
-    public abstract function getModel();
-
+    abstract public function getModel();
 
     public function findById($id)
     {
         return $this->getModel()->find($id);
+    }
+
+    public function findByIdWith($id, array $with = [])
+    {
+        return $this->getModel()->with($with)->find($id);
     }
 
     public function findFirst($conditions, $with = [])
@@ -50,6 +54,7 @@ abstract class BaseRepository
         if ($result) {
             return $this->getModel()->destroy($id);
         }
+
         return false;
     }
 
@@ -59,6 +64,7 @@ abstract class BaseRepository
         if ($result) {
             return $this->getModel()->destroy($result->id);
         }
+
         return false;
     }
 
@@ -66,11 +72,11 @@ abstract class BaseRepository
     {
         $count = 0;
         $results = $this->findAll($conditions);
-        if (sizeof($results) > 0) {
+        if (count($results) > 0) {
             foreach ($results as $result) {
                 if ($result) {
                     $this->getModel()->destory($result->id);
-                    ++$count;
+                    $count++;
                 }
             }
         }

@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class UpdateBrokerRequest extends FormRequest
+class UpdateBrokerRequest extends BaseRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -14,9 +14,18 @@ class UpdateBrokerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['max:255'],
-            'address' => ['max:255'],
-            'phone_number' => ['numeric', 'unique:brokers'],
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'address' => ['sometimes', 'required', 'string', 'max:255'],
+            'phone_number' => [
+                'sometimes',
+                'required',
+                'string',
+                'max:30',
+                Rule::unique('brokers', 'phone_number')->ignore($this->route('broker') ?? $this->route('id')),
+            ],
+            'city' => ['sometimes', 'required', 'string', 'max:100'],
+            'zip_code' => ['sometimes', 'required', 'string', 'max:20'],
+            'logo' => ['sometimes', 'nullable', 'url', 'max:2048'],
         ];
     }
 }

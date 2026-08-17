@@ -14,16 +14,19 @@ class PropertyCharacteristicService extends BaseService
     public function createPropertyCharacteristics($request, $property)
     {
         return $this->repo->insert([
-            "property_id"=> $property->id,
-            "price"=> $request->price,
-            "bedrooms"=> $request->bedrooms,
-            "square_feet"=> $request->square_feet,
-            "price_square_feet"=> $request->price_square_feet,
-            "property_type"=> $request->property_type,
-            "status"=> $request->status,
+            'property_id' => $property->id,
+            'price' => $request->price,
+            'bedrooms' => $request->bedrooms,
+            'bathrooms' => $request->bathrooms,
+            'square_feet' => $request->square_feet,
+            'price_square_feet' => $request->price_square_feet,
+            'property_type' => $request->property_type,
+            'status' => $request->status,
         ]);
     }
+
+    public function updatePropertyCharacteristics(array $attributes, $property)
+    {
+        return $property->characteristic()->update($attributes);
+    }
 }
-
-
-

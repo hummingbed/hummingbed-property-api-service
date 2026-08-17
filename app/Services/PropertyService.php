@@ -2,13 +2,16 @@
 
 namespace App\Services;
 
-use App\Repositories\PropertyRepository;
 use App\Exceptions\EntityNotFoundException;
 use App\Helpers\ResponseMessages;
+use App\Repositories\PropertyRepository;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 class PropertyService extends BaseService
 {
     protected PropertyCharacteristicService $propertyCharacteristicService;
+
     protected BrokerService $brokerService;
 
     public function __construct(PropertyRepository $repository, BrokerService $brokerService, PropertyCharacteristicService $propertyCharacteristicService)
@@ -18,9 +21,9 @@ class PropertyService extends BaseService
         $this->brokerService = $brokerService;
     }
 
-    public function allProperties()
+    public function allProperties(array $filters = [])
     {
-        return $this->repo->findAll([], 'characteristic');
+        return $this->repo->search($filters);
     }
 
     private function checkBrokerExist($request)
@@ -30,28 +33,51 @@ class PropertyService extends BaseService
 
     public function storePropertiesWithCharacteristics($request)
     {
-        $this->checkBrokerExist($request);
-       
-        $property = $this->repo->insert([
-            'broker_id'=> $request->broker_id,
-            'address'=> $request->address,
-            'listing_type'=> $request->listing_type,
-            'city'=> $request->city,
-            'zip_code'=> $request->zip_code,
-            'description'=> $request->description,
-            'build_year'=> $request->build_year
-        ]);
+        return DB::transaction(function () use ($request) {
+            $this->checkBrokerExist($request);
 
-        $this->propertyCharacteristicService->createPropertyCharacteristics($request, $property);
+            $property = $this->repo->insert($request->safe()->only([
+                'broker_id', 'address', 'listing_type', 'city', 'zip_code', 'description', 'build_year',
+            ]));
+
+            $this->propertyCharacteristicService->createPropertyCharacteristics($request, $property);
+
+            return $property->load(['broker', 'characteristic', 'images', 'amenities']);
+        });
     }
 
-    public function updateProperties($request)
+    public function updateProperty($request, $id)
     {
+        return DB::transaction(function () use ($request, $id) {
+            $property = $this->getPropertyById($id);
+            $attributes = $request->validated();
 
+            $property->update(Arr::only($attributes, [
+                'broker_id', 'address', 'listing_type', 'city', 'zip_code', 'description', 'build_year',
+            ]));
+
+            $characteristics = Arr::only($attributes, [
+                'price', 'bedrooms', 'bathrooms', 'square_feet', 'price_square_feet', 'property_type', 'status',
+            ]);
+
+            if ($characteristics !== []) {
+                $this->propertyCharacteristicService->updatePropertyCharacteristics($characteristics, $property);
+            }
+
+            return $property->refresh()->load(['broker', 'characteristic', 'images', 'amenities']);
+        });
     }
 
     public function getPropertyById($id)
     {
-        return $this->repo->findById($id);
+        $property = $this->repo->findByIdWith($id, ['broker', 'characteristic', 'images', 'amenities']);
+        throw_unless($property, new EntityNotFoundException(ResponseMessages::notFoundErrorMessage("Property id $id")));
+
+        return $property;
+    }
+
+    public function deleteProperty($id): void
+    {
+        $this->getPropertyById($id)->delete();
     }
 }

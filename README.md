@@ -1,66 +1,85 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Hummingbed Property API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel API for managing property brokers and searchable real-estate listings. A property belongs to a broker and has one set of characteristics containing its price, size, type, and availability status.
 
-## About Laravel
+## Requirements
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.1 or later
+- Composer
+- MySQL for local/production use, or SQLite for tests
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Local setup
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+php artisan serve
+```
 
-## Learning Laravel
+Set the database values in `.env` before running migrations. Interactive request documentation is available at `/request-docs` while the application is running.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## API
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+The preferred endpoints use the `/api/v1` prefix. Older endpoints remain available temporarily for backwards compatibility.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Bearer-token authentication is provided by Laravel Sanctum. Register through `POST /api/v1/auth/register`, log in through `POST /api/v1/auth/login`, and send the returned token as `Authorization: Bearer <token>`. Public listing, broker, amenity, and enquiry endpoints do not require a token.
 
-## Laravel Sponsors
+### Properties
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `GET` | `/api/v1/properties` | List and filter properties |
+| `POST` | `/api/v1/properties` | Create a property and its characteristics |
+| `GET` | `/api/v1/properties/{id}` | Retrieve a property |
+| `PATCH` | `/api/v1/properties/{id}` | Partially update a property |
+| `DELETE` | `/api/v1/properties/{id}` | Delete a property |
 
-### Premium Partners
+The listing endpoint accepts `city`, `listing_type`, `property_type`, `status`, `min_price`, `max_price`, `amenity`, `featured`, and `per_page`. Prices are returned as integer naira amounts so API consumers can sort and calculate with them safely.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### Brokers
 
-## Contributing
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `GET` | `/api/v1/brokers` | List brokers |
+| `POST` | `/api/v1/brokers` | Create a broker |
+| `GET` | `/api/v1/brokers/{id}` | Retrieve a broker |
+| `PATCH` | `/api/v1/brokers/{id}` | Partially update a broker |
+| `DELETE` | `/api/v1/brokers/{id}` | Delete a broker and its properties |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Marketplace features
 
-## Code of Conduct
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `GET` | `/api/v1/amenities` | List available amenities |
+| `PUT` | `/api/v1/properties/{id}/amenities` | Set listing amenities |
+| `POST` | `/api/v1/properties/{id}/images` | Add an ordered listing image |
+| `DELETE` | `/api/v1/properties/{id}/images/{image}` | Remove a listing image |
+| `GET` | `/api/v1/favorites` | List the current user's saved listings |
+| `POST` | `/api/v1/properties/{id}/favorite` | Save a listing |
+| `DELETE` | `/api/v1/properties/{id}/favorite` | Remove a saved listing |
+| `POST` | `/api/v1/properties/{id}/inquiries` | Send an enquiry |
+| `GET` | `/api/v1/inquiries` | List enquiries received by a broker |
+| `PATCH` | `/api/v1/inquiries/{id}` | Progress an enquiry |
+| `POST` | `/api/v1/properties/{id}/appointments` | Request a viewing |
+| `GET` | `/api/v1/appointments` | List the customer's viewings |
+| `PATCH` | `/api/v1/appointments/{id}/cancel` | Cancel a viewing |
+| `GET` | `/api/v1/broker/appointments` | List viewing requests received by a broker |
+| `PATCH` | `/api/v1/broker/appointments/{id}` | Confirm or complete a viewing |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Tests
 
-## Security Vulnerabilities
+Tests use an in-memory SQLite database:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+php artisan test
+```
 
-## License
+The property feature suite covers atomic creation, persisted characteristics, filtering, pagination, updates, deletion cascades, and 404 responses.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Next milestones
+
+- Draft, review, publication, and archival workflow
+- Image uploads backed by object storage (current image endpoints accept hosted URLs)
+- API rate limits, queues, monitoring, and CI
