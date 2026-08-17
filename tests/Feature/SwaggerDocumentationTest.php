@@ -31,4 +31,20 @@ class SwaggerDocumentationTest extends TestCase
             }
         }
     }
+
+    public function test_swagger_assets_do_not_use_insecure_absolute_urls_behind_a_proxy(): void
+    {
+        $response = $this->withServerVariables([
+            'HTTP_HOST' => 'hummingbed-property-api-service.vercel.app',
+            'HTTP_X_FORWARDED_HOST' => 'hummingbed-property-api-service.vercel.app',
+            'HTTP_X_FORWARDED_PROTO' => 'https',
+            'HTTP_X_FORWARDED_PORT' => '443',
+        ])->get('/api/documentation');
+
+        $response
+            ->assertOk()
+            ->assertDontSee('http://hummingbed-property-api-service.vercel.app', false)
+            ->assertSee('/docs/asset/swagger-ui.css', false)
+            ->assertSee('/docs/asset/swagger-ui-bundle.js', false);
+    }
 }

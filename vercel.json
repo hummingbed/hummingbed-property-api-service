@@ -21,6 +21,7 @@
         "CACHE_DRIVER": "array",
         "LOG_CHANNEL": "stderr",
         "SESSION_DRIVER": "cookie",
+        "L5_SWAGGER_USE_ABSOLUTE_PATH": "false",
         "DB_CONNECTION": "sqlite",
         "DB_DATABASE": "/tmp/database.sqlite",
         "DB_FOREIGN_KEYS": "true"
