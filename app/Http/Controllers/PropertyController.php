@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseMessages;
+use App\Http\Requests\PropertyFilterRequest;
 use App\Http\Requests\StorePropertyRequest;
 use App\Http\Requests\UpdatePropertyRequest;
 use App\Http\Resources\PropertyResource;
 use App\Services\PropertyService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class PropertyController extends BaseController
 {
@@ -19,41 +19,19 @@ class PropertyController extends BaseController
         $this->propertyService = $propertyService;
     }
 
-    public function getAllProperties(Request $request): JsonResponse
+    public function getAllProperties(PropertyFilterRequest $request): JsonResponse
     {
-        $filters = $request->validate([
-            'city' => ['sometimes', 'string', 'max:100'],
-            'listing_type' => ['sometimes', 'string'],
-            'property_type' => ['sometimes', 'string'],
-            'status' => ['sometimes', 'string'],
-            'min_price' => ['sometimes', 'integer', 'min:0'],
-            'max_price' => ['sometimes', 'integer', 'gte:min_price'],
-            'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
-            'amenity' => ['sometimes', 'string', 'max:100'],
-            'featured' => ['sometimes', 'boolean'],
-        ]);
-        $properties = $this->propertyService->allProperties($filters);
+        $properties = $this->propertyService->allProperties($request->validated());
         $transformer = PropertyResource::collection($properties)->response()->getData(true);
 
-        return $this->successHttpMessage(
-            'data',
-            $transformer,
-            ResponseMessages::getSuccessMessage('Properties', 'Retrieved'),
-            200
-        );
+        return $this->successResponse($transformer, ResponseMessages::getSuccessMessage('Properties', 'Retrieved'));
     }
 
     public function storeProperty(StorePropertyRequest $request): JsonResponse
     {
-        $this->authorizeBrokerOwnership($request, (int) $request->broker_id);
-        $property = $this->propertyService->storePropertiesWithCharacteristics($request);
+        $property = $this->propertyService->createProperty($request->validated(), $request->user());
 
-        return $this->successHttpMessage(
-            'data',
-            new PropertyResource($property),
-            ResponseMessages::getSuccessMessage('Property', 'Saved'),
-            201
-        );
+        return $this->successResponse(new PropertyResource($property), ResponseMessages::getSuccessMessage('Property', 'Saved'), 201);
     }
 
     public function getSingleProperty($id): JsonResponse
@@ -61,49 +39,20 @@ class PropertyController extends BaseController
         $property = $this->propertyService->getPropertyById($id);
         $propertyTransformer = new PropertyResource($property);
 
-        return $this->successHttpMessage(
-            'data',
-            $propertyTransformer,
-            ResponseMessages::getSuccessMessage('Property', 'retrieved'),
-            200
-        );
+        return $this->successResponse($propertyTransformer, ResponseMessages::getSuccessMessage('Property', 'retrieved'));
     }
 
     public function updateProperty(UpdatePropertyRequest $request, $id): JsonResponse
     {
-        $this->authorizePropertyOwnership($request, $id);
-        $property = $this->propertyService->updateProperty($request, $id);
+        $property = $this->propertyService->updateProperty($request->validated(), $id, $request->user());
 
-        return $this->successHttpMessage(
-            'data',
-            new PropertyResource($property),
-            ResponseMessages::getSuccessMessage('Property', 'updated'),
-            200
-        );
+        return $this->successResponse(new PropertyResource($property), ResponseMessages::getSuccessMessage('Property', 'updated'));
     }
 
     public function deleteProperty($id): JsonResponse
     {
-        $this->authorizePropertyOwnership(request(), $id);
-        $this->propertyService->deleteProperty($id);
+        $this->propertyService->deleteProperty($id, request()->user());
 
-        return $this->successHttpMessage(
-            'data',
-            null,
-            ResponseMessages::getSuccessMessage('Property', 'deleted'),
-            200
-        );
-    }
-
-    private function authorizePropertyOwnership(Request $request, $id): void
-    {
-        $property = $this->propertyService->getPropertyById($id);
-        $this->authorizeBrokerOwnership($request, $property->broker_id);
-    }
-
-    private function authorizeBrokerOwnership(Request $request, int $brokerId): void
-    {
-        $broker = \App\Models\Broker::findOrFail($brokerId);
-        abort_unless($request->user()->role === 'admin' || $broker->user_id === $request->user()->id, 403);
+        return $this->successResponse(message: ResponseMessages::getSuccessMessage('Property', 'deleted'));
     }
 }

@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Exceptions\EntityNotFoundException;
 use App\Helpers\ResponseMessages;
+use App\Models\Broker;
+use App\Models\User;
 use App\Repositories\BrokerRepository;
 
 class BrokerService extends BaseService
@@ -26,21 +28,32 @@ class BrokerService extends BaseService
         return $broker;
     }
 
-    public function saveBroker($request, int $userId)
+    public function createBroker(array $attributes, User $user): Broker
     {
-        return $this->repo->insert($request->validated() + ['user_id' => $userId]);
+        abort_unless(in_array($user->role, ['broker', 'admin'], true), 403);
+        abort_if(Broker::where('user_id', $user->id)->exists(), 422, 'This account already has a broker profile.');
+
+        return $this->repo->insert($attributes + ['user_id' => $user->id]);
     }
 
-    public function updateBrokerById($request, $id)
+    public function updateBroker(array $attributes, int $id, User $user): Broker
     {
         $broker = $this->getBrokerById($id);
-        $broker->update($request->validated());
+        $this->authorizeOwner($broker, $user);
+        $broker->update($attributes);
 
         return $broker->refresh();
     }
 
-    public function deleteBrokerById($id)
+    public function deleteBroker(int $id, User $user): void
     {
-        return $this->getBrokerById($id)->delete();
+        $broker = $this->getBrokerById($id);
+        $this->authorizeOwner($broker, $user);
+        $broker->delete();
+    }
+
+    private function authorizeOwner(Broker $broker, User $user): void
+    {
+        abort_unless($user->role === 'admin' || $broker->user_id === $user->id, 403);
     }
 }

@@ -2,56 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
+use App\Http\Resources\AuthResource;
+use App\Http\Resources\UserResource;
+use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends BaseController
 {
-    public function register(Request $request): JsonResponse
+    public function __construct(private readonly AuthService $authService)
     {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role' => ['sometimes', 'in:customer,broker'],
-        ]);
-        $data['role'] ??= 'customer';
-
-        $user = User::create($data);
-
-        return response()->json([
-            'status' => 'success',
-            'data' => ['user' => $user, 'token' => $user->createToken('api')->plainTextToken],
-        ], 201);
     }
 
-    public function login(Request $request): JsonResponse
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $credentials = $request->validate(['email' => ['required', 'email'], 'password' => ['required', 'string']]);
-        $user = User::where('email', $credentials['email'])->first();
+        return $this->successResponse(new AuthResource($this->authService->register($request->validated())), status: 201);
+    }
 
-        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
-            throw ValidationException::withMessages(['email' => ['The provided credentials are incorrect.']]);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'data' => ['user' => $user, 'token' => $user->createToken('api')->plainTextToken],
-        ]);
+    public function login(LoginRequest $request): JsonResponse
+    {
+        return $this->successResponse(new AuthResource($this->authService->login($request->validated())));
     }
 
     public function me(Request $request): JsonResponse
     {
-        return response()->json(['status' => 'success', 'data' => $request->user()->load('broker')]);
+        return $this->successResponse(new UserResource($this->authService->currentUser($request->user())));
     }
 
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        $this->authService->logout($request->user());
 
-        return response()->json(['status' => 'success', 'message' => 'Logged out successfully']);
+        return $this->successResponse(message: 'Logged out successfully');
     }
 }

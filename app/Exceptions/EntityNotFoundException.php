@@ -3,15 +3,15 @@
 namespace App\Exceptions;
 
 use App\Traits\HttpResponses;
-
 use Exception;
+use Illuminate\Http\JsonResponse;
 
 class EntityNotFoundException extends Exception
 {
     use HttpResponses;
 
-    public function render()
+    public function render(): JsonResponse
     {
-        return $this->errorHttpMessage(null, 404, $this->getMessage());
+        return $this->errorResponse($this->getMessage(), 404);
     }
 }

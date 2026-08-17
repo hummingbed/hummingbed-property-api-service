@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\PropertyCharacteristicRepository;
+use Illuminate\Support\Arr;
 
 class PropertyCharacteristicService extends BaseService
 {
@@ -11,18 +12,11 @@ class PropertyCharacteristicService extends BaseService
         $this->repo = $repository;
     }
 
-    public function createPropertyCharacteristics($request, $property)
+    public function createPropertyCharacteristics(array $attributes, $property)
     {
-        return $this->repo->insert([
-            'property_id' => $property->id,
-            'price' => $request->price,
-            'bedrooms' => $request->bedrooms,
-            'bathrooms' => $request->bathrooms,
-            'square_feet' => $request->square_feet,
-            'price_square_feet' => $request->price_square_feet,
-            'property_type' => $request->property_type,
-            'status' => $request->status,
-        ]);
+        return $this->repo->insert(Arr::only($attributes, [
+            'price', 'bedrooms', 'bathrooms', 'square_feet', 'price_square_feet', 'property_type', 'status',
+        ]) + ['property_id' => $property->id]);
     }
 
     public function updatePropertyCharacteristics(array $attributes, $property)

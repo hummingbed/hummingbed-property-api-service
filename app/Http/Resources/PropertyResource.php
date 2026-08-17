@@ -26,16 +26,10 @@ class PropertyResource extends JsonResource
                 'is_featured' => $this->is_featured,
                 'published_at' => $this->published_at,
             ],
-            'characteristics' => $this->whenLoaded('characteristic'),
-            'broker' => $this->whenLoaded('broker', fn () => [
-                'id' => $this->broker->id,
-                'name' => $this->broker->name,
-                'address' => $this->broker->address,
-                'phone_number' => $this->broker->phone_number,
-                'logo' => $this->broker->logo,
-            ]),
-            'images' => $this->whenLoaded('images'),
-            'amenities' => $this->whenLoaded('amenities'),
+            'characteristics' => PropertyCharacteristicResource::make($this->whenLoaded('characteristic')),
+            'broker' => BrokerResource::make($this->whenLoaded('broker')),
+            'images' => PropertyImageResource::collection($this->whenLoaded('images')),
+            'amenities' => AmenityResource::collection($this->whenLoaded('amenities')),
             'is_favorite' => $this->when(auth('sanctum')->check(), fn () => $this->favorites()->where('user_id', auth('sanctum')->id())->exists()),
         ];
     }

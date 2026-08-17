@@ -1,25 +1,41 @@
 <?php
+
 namespace App\Traits;
 
 use Illuminate\Http\JsonResponse;
 
 trait HttpResponses
 {
-    protected function successHttpMessage($dataType, $data, $message, $code): JsonResponse
+    protected function successResponse(mixed $data = null, ?string $message = null, int $status = 200): JsonResponse
     {
-        return response()->json([
+        $payload = [
             'status' => 'success',
-            'message' => $message,
-            $dataType => $data
-        ], $code);
+            'data' => $data,
+        ];
+
+        if ($message !== null) {
+            $payload['message'] = $message;
+        }
+
+        return response()->json($payload, $status);
     }
 
-    protected function errorHttpMessage($data, $code, $message = null,): JsonResponse
-    {
-        return response()->json([
+    protected function errorResponse(
+        ?string $message = null,
+        int $status = 400,
+        mixed $data = null,
+        ?array $errors = null,
+    ): JsonResponse {
+        $payload = [
             'status' => 'failed',
             'message' => $message,
-            'data' => $data
-        ], $code);
+            'data' => $data,
+        ];
+
+        if ($errors !== null) {
+            $payload['errors'] = $errors;
+        }
+
+        return response()->json($payload, $status);
     }
 }

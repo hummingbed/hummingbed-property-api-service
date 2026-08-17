@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use App\Traits\HttpResponses;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -14,6 +15,8 @@ use Throwable;
 
 class Handler extends ExceptionHandler
 {
+    use HttpResponses;
+
     /**
      * The list of the inputs that are never flashed to the session on validation exceptions.
      *
@@ -47,11 +50,7 @@ class Handler extends ExceptionHandler
     private function apiExceptionResponse(Throwable $e): JsonResponse
     {
         if ($e instanceof ValidationException) {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'The given data was invalid.',
-                'errors' => $e->errors(),
-            ], $e->status);
+            return $this->errorResponse('The given data was invalid.', $e->status, errors: $e->errors());
         }
 
         $status = match (true) {
@@ -72,10 +71,6 @@ class Handler extends ExceptionHandler
             $message = 'An unexpected error occurred.';
         }
 
-        return response()->json([
-            'status' => 'failed',
-            'message' => $message,
-            'data' => null,
-        ], $status);
+        return $this->errorResponse($message, $status);
     }
 }
