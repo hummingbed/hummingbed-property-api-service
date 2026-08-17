@@ -1,0 +1,2015 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Hummingbed Property API",
+        "description": "Property marketplace API for listings, brokers, saved properties, enquiries, and viewing appointments.",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/v1/auth/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register an account",
+                "operationId": "3655d8c533e5d093964abe31a1e76245",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "enum": [
+                                            "customer",
+                                            "broker"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Account created"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Log in and receive a bearer token",
+                "operationId": "7b80757ab3670ece9e2e3ea892f0b0de",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "ada@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Authenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/me": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Get the authenticated account",
+                "operationId": "ffd09fc13a67aaad0963089f26b3a1f1",
+                "responses": {
+                    "200": {
+                        "description": "Current account"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Revoke the current token",
+                "operationId": "e21fc7d92e2296a66f43bef60092f3ac",
+                "responses": {
+                    "200": {
+                        "description": "Logged out"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/properties": {
+            "get": {
+                "tags": [
+                    "Properties"
+                ],
+                "summary": "Search and paginate properties",
+                "operationId": "47fb1b9f1cc033c4afe50c1b8c6c98cb",
+                "parameters": [
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "property_type",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "min_price",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "max_price",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "amenity",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "featured",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated properties"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Properties"
+                ],
+                "summary": "Create a property",
+                "operationId": "5963296da9208add1f4b92e8c2c503ef",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PropertyInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Property created"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/properties/{id}": {
+            "get": {
+                "tags": [
+                    "Properties"
+                ],
+                "summary": "Get a property",
+                "operationId": "30d2bbb99598de59dd52a9f20b512893",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Property details"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Properties"
+                ],
+                "summary": "Replace a property",
+                "operationId": "e370385df86b5adf8fceed74518b8adc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PropertyInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Property updated"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Properties"
+                ],
+                "summary": "Delete a property",
+                "operationId": "10f12c24915151aff695e875929c404a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Property deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Properties"
+                ],
+                "summary": "Partially update a property",
+                "operationId": "ecc962fc546423880b766982a4b7d7f2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PropertyInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Property updated"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/brokers": {
+            "get": {
+                "tags": [
+                    "Brokers"
+                ],
+                "summary": "List brokers",
+                "operationId": "d396707afeee0a7e5c02ce32f6593253",
+                "responses": {
+                    "200": {
+                        "description": "Broker list"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Brokers"
+                ],
+                "summary": "Create a broker profile",
+                "operationId": "62e73c7a3cabc3be885b751d21539585",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BrokerInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Broker created"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/brokers/{id}": {
+            "get": {
+                "tags": [
+                    "Brokers"
+                ],
+                "summary": "Get a broker",
+                "operationId": "54d92ea5b9c4676102a4c0251226d16e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Broker details"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Brokers"
+                ],
+                "summary": "Replace a broker profile",
+                "operationId": "f8aaba073912b9e9279a8e783b31edb6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BrokerInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Broker updated"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Brokers"
+                ],
+                "summary": "Delete a broker",
+                "operationId": "ba9fa2e85852fe5aef7d20788054da2a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Broker deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Brokers"
+                ],
+                "summary": "Partially update a broker",
+                "operationId": "0d8c753e76f927c6b4a4d3140d819f76",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BrokerInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Broker updated"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/amenities": {
+            "get": {
+                "tags": [
+                    "Amenities"
+                ],
+                "summary": "List amenities",
+                "operationId": "7a01d0d6494b1bc1622fe3feeab96428",
+                "responses": {
+                    "200": {
+                        "description": "Amenity list"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Amenities"
+                ],
+                "summary": "Create an amenity",
+                "operationId": "89cfc881879db9cc10f4c937ba3ab3ab",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 100,
+                                        "example": "Gym"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Amenity created"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/properties/{property}/amenities": {
+            "put": {
+                "tags": [
+                    "Amenities"
+                ],
+                "summary": "Set property amenities",
+                "operationId": "9255bf7e97c9670cdbf13cfdcca9cee5",
+                "parameters": [
+                    {
+                        "name": "property",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "amenity_ids"
+                                ],
+                                "properties": {
+                                    "amenity_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            3,
+                                            5
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Amenities synchronized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/properties/{property}/images": {
+            "post": {
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Add a hosted property image",
+                "operationId": "d11ba556e98914914db02b85aa16954c",
+                "parameters": [
+                    {
+                        "name": "property",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "url"
+                                ],
+                                "properties": {
+                                    "url": {
+                                        "type": "string",
+                                        "format": "uri"
+                                    },
+                                    "alt_text": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "sort_order": {
+                                        "type": "integer",
+                                        "minimum": 0
+                                    },
+                                    "is_primary": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Image added"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/properties/{property}/images/{image}": {
+            "delete": {
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Delete a property image",
+                "operationId": "4e16d971ccf674780b63e5926aabc04b",
+                "parameters": [
+                    {
+                        "name": "property",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "image",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/favorites": {
+            "get": {
+                "tags": [
+                    "Favorites"
+                ],
+                "summary": "List saved properties",
+                "operationId": "8fd4e5883d19c9cd79aa2e1049fcea79",
+                "responses": {
+                    "200": {
+                        "description": "Saved properties"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/properties/{property}/favorite": {
+            "post": {
+                "tags": [
+                    "Favorites"
+                ],
+                "summary": "Save a property",
+                "operationId": "891256cddaef28ecb26103416b996953",
+                "parameters": [
+                    {
+                        "name": "property",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Property saved"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Favorites"
+                ],
+                "summary": "Remove a saved property",
+                "operationId": "236c52e21f5105b888b3d57130890160",
+                "parameters": [
+                    {
+                        "name": "property",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Favorite removed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/properties/{property}/inquiries": {
+            "post": {
+                "tags": [
+                    "Inquiries"
+                ],
+                "summary": "Submit a property enquiry",
+                "description": "Public endpoint. If a valid Sanctum token is supplied, the enquiry is associated with that account.",
+                "operationId": "0a9063300c9f227739c7a14b8f34e37a",
+                "parameters": [
+                    {
+                        "name": "property",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "message"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Ada Okafor"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "phone_number": {
+                                        "type": "string",
+                                        "maxLength": 30,
+                                        "nullable": true
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "maxLength": 5000,
+                                        "example": "Is this property still available?"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Enquiry submitted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Inquiry"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/inquiries": {
+            "get": {
+                "tags": [
+                    "Inquiries"
+                ],
+                "summary": "List enquiries received by a broker",
+                "operationId": "1ad72fb8f2f313d506cc762a365f5cf4",
+                "responses": {
+                    "200": {
+                        "description": "Enquiry list"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/inquiries/{inquiry}": {
+            "patch": {
+                "tags": [
+                    "Inquiries"
+                ],
+                "summary": "Update enquiry status",
+                "operationId": "14f339cfe99a72fde02131838e2e990e",
+                "parameters": [
+                    {
+                        "name": "inquiry",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "new",
+                                            "contacted",
+                                            "closed"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Enquiry updated"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/appointments": {
+            "get": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "List customer viewing appointments",
+                "operationId": "743a3fbe88d35512b4a676fbf6fc8cb9",
+                "responses": {
+                    "200": {
+                        "description": "Appointment list"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/properties/{property}/appointments": {
+            "post": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Request a viewing appointment",
+                "operationId": "2e42f7ab3bc48d63b9091ef85438c60b",
+                "parameters": [
+                    {
+                        "name": "property",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "scheduled_at"
+                                ],
+                                "properties": {
+                                    "scheduled_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-08-20T14:00:00+01:00"
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "maxLength": 2000,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Viewing requested",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Appointment"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/appointments/{appointment}/cancel": {
+            "patch": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Cancel a viewing appointment",
+                "operationId": "253efe6a25f36c889f3fee5ae6031313",
+                "parameters": [
+                    {
+                        "name": "appointment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Viewing cancelled"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/broker/appointments": {
+            "get": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "List viewing requests received by a broker",
+                "operationId": "9388af0ae7e90946cbdc7626694e4d42",
+                "responses": {
+                    "200": {
+                        "description": "Broker appointment list"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        },
+        "/api/v1/broker/appointments/{appointment}": {
+            "patch": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Update a viewing request",
+                "operationId": "d0230f9901d5fc038e4d78f5d8155c43",
+                "parameters": [
+                    {
+                        "name": "appointment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "confirmed",
+                                            "completed",
+                                            "cancelled"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Viewing updated"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "/",
+                        "description": "Current application"
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ApiResponse": {
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "message": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "data": {
+                        "type": "object",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "required": [
+                    "status",
+                    "message"
+                ],
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "failed"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "The given data was invalid."
+                    },
+                    "errors": {
+                        "type": "object",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "required": [
+                    "id",
+                    "name",
+                    "email",
+                    "role"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Ada Okafor"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "ada@example.com"
+                    },
+                    "role": {
+                        "type": "string",
+                        "enum": [
+                            "customer",
+                            "broker",
+                            "admin"
+                        ],
+                        "example": "customer"
+                    }
+                },
+                "type": "object"
+            },
+            "AuthResponse": {
+                "required": [
+                    "status",
+                    "data"
+                ],
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "data": {
+                        "required": [
+                            "user",
+                            "token"
+                        ],
+                        "properties": {
+                            "user": {
+                                "$ref": "#/components/schemas/User"
+                            },
+                            "token": {
+                                "type": "string",
+                                "example": "1|sanctum-token"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "Broker": {
+                "required": [
+                    "id",
+                    "name",
+                    "address",
+                    "city",
+                    "zip_code",
+                    "phone_number"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 2,
+                        "nullable": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Hummingbed Realty"
+                    },
+                    "address": {
+                        "type": "string",
+                        "example": "15 Admiralty Way"
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "Lagos"
+                    },
+                    "zip_code": {
+                        "type": "string",
+                        "example": "101233"
+                    },
+                    "phone_number": {
+                        "type": "string",
+                        "example": "+2348012345678"
+                    },
+                    "logo": {
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "PropertyCharacteristic": {
+                "properties": {
+                    "price": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 75000000
+                    },
+                    "bedrooms": {
+                        "type": "integer",
+                        "example": 4
+                    },
+                    "bathrooms": {
+                        "type": "integer",
+                        "example": 4,
+                        "nullable": true
+                    },
+                    "square_feet": {
+                        "type": "integer",
+                        "example": 2500
+                    },
+                    "price_square_feet": {
+                        "type": "integer",
+                        "example": 30000
+                    },
+                    "property_type": {
+                        "type": "string",
+                        "enum": [
+                            "self-contained",
+                            "one-bedroom-flat",
+                            "two-bedroom-flat",
+                            "three-bedroom-flat",
+                            "bungalow",
+                            "duplex"
+                        ]
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "sold",
+                            "on sale",
+                            "on hold"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "PropertyImage": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "url": {
+                        "type": "string",
+                        "format": "uri",
+                        "example": "https://cdn.example.com/properties/10/front.jpg"
+                    },
+                    "alt_text": {
+                        "type": "string",
+                        "example": "Front view",
+                        "nullable": true
+                    },
+                    "sort_order": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "is_primary": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "Amenity": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "24-hour Power"
+                    },
+                    "slug": {
+                        "type": "string",
+                        "example": "24-hour-power"
+                    }
+                },
+                "type": "object"
+            },
+            "Property": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "attributes": {
+                        "properties": {
+                            "address": {
+                                "type": "string",
+                                "example": "12 Admiralty Way"
+                            },
+                            "listing_type": {
+                                "type": "string",
+                                "enum": [
+                                    "open listing",
+                                    "sell listing",
+                                    "exclusive agency listing",
+                                    "net listing"
+                                ]
+                            },
+                            "city": {
+                                "type": "string",
+                                "example": "Lagos"
+                            },
+                            "zip_code": {
+                                "type": "string",
+                                "example": "101233"
+                            },
+                            "description": {
+                                "type": "string"
+                            },
+                            "build_year": {
+                                "type": "integer",
+                                "example": 2020
+                            },
+                            "is_featured": {
+                                "type": "boolean"
+                            },
+                            "published_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "characteristics": {
+                        "$ref": "#/components/schemas/PropertyCharacteristic"
+                    },
+                    "broker": {
+                        "$ref": "#/components/schemas/Broker"
+                    },
+                    "images": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PropertyImage"
+                        }
+                    },
+                    "amenities": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Amenity"
+                        }
+                    },
+                    "is_favorite": {
+                        "type": "boolean",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Inquiry": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "property_id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "phone_number": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "new",
+                            "contacted",
+                            "closed"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "Appointment": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "property_id": {
+                        "type": "integer"
+                    },
+                    "user_id": {
+                        "type": "integer"
+                    },
+                    "scheduled_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "confirmed",
+                            "completed",
+                            "cancelled"
+                        ]
+                    },
+                    "notes": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "BrokerInput": {
+                "required": [
+                    "name",
+                    "address",
+                    "phone_number",
+                    "city",
+                    "zip_code"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "address": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "phone_number": {
+                        "type": "string",
+                        "maxLength": 30
+                    },
+                    "city": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "zip_code": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "logo": {
+                        "type": "string",
+                        "format": "uri",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "PropertyInput": {
+                "required": [
+                    "broker_id",
+                    "address",
+                    "listing_type",
+                    "city",
+                    "zip_code",
+                    "description",
+                    "build_year",
+                    "price",
+                    "bedrooms",
+                    "square_feet",
+                    "price_square_feet",
+                    "property_type",
+                    "status"
+                ],
+                "properties": {
+                    "broker_id": {
+                        "type": "integer"
+                    },
+                    "address": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "listing_type": {
+                        "type": "string",
+                        "enum": [
+                            "open listing",
+                            "sell listing",
+                            "exclusive agency listing",
+                            "net listing"
+                        ]
+                    },
+                    "city": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "zip_code": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "build_year": {
+                        "type": "integer",
+                        "minimum": 1800,
+                        "example": 2020
+                    },
+                    "price": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "bedrooms": {
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 0
+                    },
+                    "bathrooms": {
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 0,
+                        "nullable": true
+                    },
+                    "square_feet": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "price_square_feet": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "property_type": {
+                        "type": "string",
+                        "enum": [
+                            "self-contained",
+                            "one-bedroom-flat",
+                            "two-bedroom-flat",
+                            "three-bedroom-flat",
+                            "bungalow",
+                            "duplex"
+                        ]
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "sold",
+                            "on sale",
+                            "on hold"
+                        ]
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "responses": {
+            "Unauthorized": {
+                "description": "Missing or invalid bearer token",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "Forbidden": {
+                "description": "The authenticated account does not own the resource",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "NotFound": {
+                "description": "Resource not found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "ValidationError": {
+                "description": "Request validation failed",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "bearerFormat": "Token",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        },
+        {
+            "name": "Properties",
+            "description": "Properties"
+        },
+        {
+            "name": "Brokers",
+            "description": "Brokers"
+        },
+        {
+            "name": "Amenities",
+            "description": "Amenities"
+        },
+        {
+            "name": "Images",
+            "description": "Images"
+        },
+        {
+            "name": "Favorites",
+            "description": "Favorites"
+        },
+        {
+            "name": "Inquiries",
+            "description": "Inquiries"
+        },
+        {
+            "name": "Appointments",
+            "description": "Appointments"
+        }
+    ]
+}

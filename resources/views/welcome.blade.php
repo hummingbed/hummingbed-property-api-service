@@ -12,7 +12,7 @@
 
     <div class="text-center" style="margin-top: 20%;">
         <p>the is an api project, click the button below to visit the documentation</p>
-       <a type="button" href="{{ url('/request-docs') }}" class="btn btn-outline-primary">API documentation</a>
+       <a type="button" href="{{ url('/api/documentation') }}" class="btn btn-outline-primary">Swagger API documentation</a>
     </div>
     
  

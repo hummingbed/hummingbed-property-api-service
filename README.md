@@ -6,19 +6,38 @@ A Laravel API for managing property brokers and searchable real-estate listings.
 
 - PHP 8.1 or later
 - Composer
-- MySQL for local/production use, or SQLite for tests
+- PHP SQLite extension (`pdo_sqlite`)
 
 ## Local setup
 
 ```bash
 composer install
 cp .env.example .env
+touch database/database.sqlite
 php artisan key:generate
 php artisan migrate --seed
 php artisan serve
 ```
 
-Set the database values in `.env` before running migrations. Interactive request documentation is available at `/request-docs` while the application is running.
+SQLite is the default and only configured database. The application uses `database/database.sqlite`; no database server or credentials are required. Interactive Swagger UI is available at `/api/documentation` while the application is running.
+
+Regenerate the OpenAPI document after changing endpoints:
+
+```bash
+php artisan l5-swagger:generate
+```
+
+API errors are always returned as JSON, including requests sent from Swagger UI:
+
+```json
+{
+  "status": "failed",
+  "message": "Unauthenticated.",
+  "data": null
+}
+```
+
+Validation failures use HTTP `422` and include an `errors` object keyed by input field. In Swagger UI, use the **Authorize** button and enter the token returned by the login or registration endpoint.
 
 ## API
 
